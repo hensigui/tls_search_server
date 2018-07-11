@@ -100,19 +100,19 @@ public class RelevantResultsImpl implements RelevantResults{
 	private JSONArray trySearch(String cx,String query,String start,String token)throws Exception{
 		String urlStr=
 				"https://www.googleapis.com/customsearch/v1element?key=AIzaSyCVAXiUzRYsML1Pv6RwSG1gunmMikTzQqY&rsz=filtered_cse&num=10&hl=en&prettyPrint=false&source=gcsc&gss=.com&sig=0c3990ce7a056ed50667fe0c3873c9b6&start="+start+"&cx="+cx+"&q="+query+"&cse_tok="+token+"&sort=&googlehost=www.google.com";
-//		URL url=new URL(urlStr);
-//		BufferedReader bufr=new BufferedReader(new InputStreamReader(new BufferedInputStream(url.openStream()),"utf-8"));
-//		String line;
-//		StringBuffer sb=new StringBuffer();
-//		while((line=bufr.readLine())!=null){
-//			sb.append(line);
-//		}
-//		bufr.close();
-//		System.out.println(sb.toString());
-		HtmlPage page = webClient.getPage(urlStr);
+		URL url=new URL(urlStr);
+		BufferedReader bufr=new BufferedReader(new InputStreamReader(new BufferedInputStream(url.openStream()),"utf-8"));
+		String line;
+		StringBuffer sb=new StringBuffer();
+		while((line=bufr.readLine())!=null){
+			sb.append(line);
+		}
+		bufr.close();
+		System.out.println(sb.toString());
+		//Page page = webClient.get;
 		
 		JSONArray r=new JSONArray();
-		JSONObject jsonObject=JSONObject.fromObject(page.asXml());
+		JSONObject jsonObject=JSONObject.fromObject(sb.toString());
 		JSONArray results=jsonObject.getJSONArray("results");
 		for(int i=0;i<results.size();i++){
 			JSONObject j=(JSONObject) results.get(i);
