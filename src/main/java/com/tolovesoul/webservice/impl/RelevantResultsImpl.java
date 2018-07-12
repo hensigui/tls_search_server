@@ -2,78 +2,48 @@ package com.tolovesoul.webservice.impl;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Map;
 
+import javax.annotation.Resource;
 import javax.jws.WebService;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import com.gargoylesoftware.htmlunit.Page;
-import com.gargoylesoftware.htmlunit.WebClient;
-import com.gargoylesoftware.htmlunit.html.HtmlPage;
 import com.tolovesoul.webservice.RelevantResults;
 
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 
 /**
- * webserivce接口实现类
- * @author user
- *
+ * webservice实现类
+ * @author yuanyue
+ * @Description: 
+ * @date 2018年7月12日
  */
 @Component("relevantResults")
 @WebService(targetNamespace="http://webservice.tolovesoul.com")
 public class RelevantResultsImpl implements RelevantResults{
-	@Autowired
-	private WebClient webClient;
+	/**
+	 * cx-token映射表
+	 */
+	@Resource(name="cxTokenMap")
+	private Map<String,String> cxTokenMap;
 	
-	@Value("${search.token}")
-	private String token;//谷歌认证token
-	
-	int index=0;
-	
-	public static List<String> urlList=new ArrayList<String>();
-	
-	{
-		BufferedReader urlReader=new BufferedReader(new InputStreamReader(RelevantResultsImpl.class.getResourceAsStream("/url.txt")));
-		String url="";
-		try {
-			while((url=urlReader.readLine())!=null){
-				urlList.add(url);
-				System.out.println(url);
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public String search(String str, String start) {
-		index=index%urlList.size(); // 计算索引
+	public String search(String str, String start ,String cx) {
 		JSONArray r=null;
 		boolean flag=true;
-		for(int i=1;i<=3;i++){
-			try {
-				r=trySearch(urlList.get(index),str,start,token);
-				System.out.println("index="+index+"执行成功！");
-				break;
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-				System.out.println("index="+index+"执行失败！");
-				if(i==3){
-					flag=false;
-				}
-				index++;
-				continue;
-			}
+		try {
+			r=trySearch(cx,str,start,cxTokenMap.get(cx));
+			System.out.println("执行成功！");
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			System.out.println("执行失败！");
+			flag=false; 
 		}
+		
 		JSONObject result=new JSONObject();
 		if(!flag){
 			result.put("success", false);
@@ -93,7 +63,7 @@ public class RelevantResultsImpl implements RelevantResults{
 	 * @param cx 谷歌自定义搜索引擎id
 	 * @param query
 	 * @param start
-	 * @param token 谷歌新增的令牌
+	 * @param token 谷歌新增的令牌，一个搜索核心对应一个token
 	 * @return
 	 * @throws Exception
 	 */
@@ -109,7 +79,6 @@ public class RelevantResultsImpl implements RelevantResults{
 		}
 		bufr.close();
 		System.out.println(sb.toString());
-		//Page page = webClient.get;
 		
 		JSONArray r=new JSONArray();
 		JSONObject jsonObject=JSONObject.fromObject(sb.toString());

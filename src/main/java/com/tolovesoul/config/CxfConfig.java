@@ -1,6 +1,8 @@
 package com.tolovesoul.config;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.xml.ws.Endpoint;
 
@@ -32,16 +34,13 @@ public class CxfConfig {
         return endpoint;
     }
     
-    @Bean
-    public WebClient webClient() {
-    	WebClient client = new WebClient(BrowserVersion.CHROME);
-		// 1 启动JS  
-		client.getOptions().setJavaScriptEnabled(false);  
-	    // 2 禁用Css，可避免自动二次请求CSS进行渲染  
-		client.getOptions().setCssEnabled(false);  
-	    // 3 启动客户端重定向  
-		client.getOptions().setRedirectEnabled(true); 
-		client.getOptions().setDownloadImages(false);
-		return client;
+    /**
+     * 用于存放cx-token映射
+     * @return
+     */
+    
+    @Bean(name="cxTokenMap")
+    public Map<String,String> cxTokenMap(){
+    	return new HashMap<String,String>();
     }
 }
